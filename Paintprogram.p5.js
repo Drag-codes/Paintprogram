@@ -71,7 +71,7 @@ function setup() {
   const by = createP("x")
   by.position(770+36, 70)
   
-  const license = createImg("https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png", "CC BY-NC-SA License")
+  const license = createImg("https://licensebuttons.net/p/zero/1.0/88x31.png", "CC0 (Public Domain) License")
   license.position(500, 82)
   
   const rt = createP('Red', 20, 13)

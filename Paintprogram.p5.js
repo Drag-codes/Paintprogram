@@ -1,8 +1,13 @@
 // SPAGHETTI CODE WARNING!!!
+
 let mode;
 let text_t;
 
 function setup() {
+  
+  current_pos = 245
+  custom_count = 0
+  
   w = 1024;
   h = 768;
 
@@ -40,7 +45,7 @@ function setup() {
 
   mode = createRadio();
   mode.option("Squares")
-  mode.option("Circles")
+  mode.option("Pencil")
   mode.option("Erase")
   mode.option("Text")
   mode.style('width', '480px');
@@ -50,17 +55,17 @@ function setup() {
   //const rgbvalues = createP("RGB Values")
   //rgbvalues.position(650, 50)
 
-  red1 = createInput(str(button1.value()))
+  red1 = createInput(str(button1.value()), "number")
   red1.style("width", "30px")
   red1.position(155, 14)
   red1.input(updateR)
 
-  green1 = createInput(str(button2.value()))
+  green1 = createInput(str(button2.value()), "number")
   green1.style("width", "30px")
   green1.position(155, 49)
   green1.input(updateG)
 
-  blue1 = createInput(str(button3.value()))
+  blue1 = createInput(str(button3.value()), "number")
   blue1.style("width", "30px")
   blue1.position(155, 84)
   blue1.input(updateB)
@@ -80,7 +85,7 @@ function setup() {
   widthX.style("width", "30px")
   // widthX.input(updateX)
 
-  widthY = createInput(str(h))
+  widthY = createInput(str(h), "number",)
   widthY.position(695, 85)
   widthY.style("width", "30px")
   // widthY.input(updateY)
@@ -96,12 +101,12 @@ function setup() {
   text_v = createInput('', 'text')
   text_v.position(735, 85)
   
-  weightV = createInput("")
+  weightV = createInput("", "number")
   weightV.style("width", "25px")
   weightV.position(405, 12)
   weightV.input(updatew_box)
   
-  thicknessV = createInput("")
+  thicknessV = createInput("", "number")
   thicknessV.style("width", "25px")
   thicknessV.position(405, 47)
   thicknessV.input(updatet_box)
@@ -196,10 +201,46 @@ function setup() {
   button9.position(750, 115)
   button9.mousePressed(setBG)
   
+  button10x = createButton("Add Color to Palette")
+  button10x.position(610, 115)
+  button10x.mousePressed(newPalette)
+  //stampShape = createRadio()
+  //stampShape.position(260, 118)
+  //stampShape.option("Square")
+  
+  textAlign(CENTER)
+  
   let drawingArea = createCanvas(w, h);
   
+  /**
   license = createImg("https://licensebuttons.net/p/zero/1.0/88x31.png", "CC0 (Public Domain) License")
   license.position(30, h)
+  **/
+}
+
+function newPalette() {
+  const r = button1.value();
+  const g = button2.value();
+  const b = button3.value();
+  
+  custom_count = custom_count + 1
+  
+  current_pos = current_pos + 20
+  
+  let rgb = "rgb(" + r + ", " + g + ", " + b + ")"
+  
+  if (custom_count > 17) {
+    alert("No more custom colors due to insufficient space\nPress E to clear custom palette");
+  } else {
+    colorP = createButton('')
+    colorP.position(current_pos, 120)
+    colorP.style("border", "1px solid black")
+    colorP.style("height", "15px")
+    colorP.style("width", "15px")
+    colorP.style("outline", "none")
+    colorP.style("background-color", rgb)
+    colorP.elt.class = "custom-palette"
+  }
 }
 
 function resizeCanvas_t() {
@@ -207,6 +248,20 @@ function resizeCanvas_t() {
   h = widthY.value()
   resizeCanvas(w, h)
   print("size is now: " + w + "x" + h)
+}
+
+function keyPressed() {
+  if (keyCode === 69) {
+    // normal html with js time!!
+    var custom_palette = document.getElementsByClassName("custom-palette");
+    
+    current_pos = current_pos - 340;
+    color_count = 0;
+    
+    for (var i = 0; i < custom_palette.length; i++) {
+      custom_palette.removeChild(custom_palette[i]);
+    }
+  }
 }
 
 function updatew_box() {
@@ -315,6 +370,7 @@ function draw() {
   const b = button3.value();
   const w = button4.value();
   const t = button5.value();
+  const flexTape = text_v.value();
   
   thicknessV.value(t)
   weightV.value(w)
@@ -328,26 +384,27 @@ function draw() {
   colorV.style("background-color", rgb)
 
   const m = mode.value();
+  m2 = m 
 
   if (mouseIsPressed) {
-    if (m === "Circles") {
+    if (m2 === "Pencil") {
       strokeWeight(w);
       fill(r, g, b);
-      circle(mouseX, mouseY, t, t);
-    } else if (m === "Squares") {
+      line(mouseX, mouseY, pmouseX, pmouseY); // default to circle
+
+    } else if (m2 === "Squares") {
       strokeWeight(w);
       fill(r, g, b);
       square(mouseX, mouseY, t);
-    } else if (m === "Erase") {
+    } else if (m2 === "Erase") {
       p5.instance.drawingContext.globalCompositeOperation = 'destination-out';
-    } else if (m === "Text") {
-      const flexTape = text_v.value();
+    } else if (m2 === "Text") {
       fill(r, g, b);
-      text(flexTape, mouseX, mouseY)
+      text(str(flexTape), mouseX-25, mouseY)
     } else {
       strokeWeight(w);
       fill(r, g, b);
-      circle(mouseX, mouseY, t, t); // default to circle
+      line(mouseX, mouseY, pmouseX, pmouseY); // default to circle
       // apparently, pmouseX and pmouseY
       // was causing the problem of
       // move cursor to the right: scales up
@@ -356,6 +413,6 @@ function draw() {
   } else {
     fill(0);
   }
-  license.position(30, h) // update license position to accomodate the canvas
+  //license.position(30, h) // update license position to accomodate the canvas
   
 }
